@@ -426,8 +426,40 @@ function toNaryString(num, n) {
  *   ['/web/assets/style.css', '/.bin/mocha',  '/read.me'] => '/'
  *   ['/web/favicon.ico', '/web-scripts/dump', '/verbalizer/logs'] => '/'
  */
-function getCommonDirectoryPath(/* pathes */) {
-  throw new Error('Not implemented');
+function getCommonDirectoryPath(pathes) {
+  const subPathes = pathes.map((item) => item.split('/'));
+
+  const subArr = [];
+  for (let i = 0; i < subPathes[0].length; i += 1) {
+    const arr = [];
+    for (let j = 0; j < subPathes.length; j += 1) {
+      arr.push(subPathes[j][i]);
+    }
+    subArr.push(arr);
+  }
+
+  const ans = [];
+  for (let i = 0; i < subArr.length; i += 1) {
+    const first = subArr[i][0];
+    let count = 0;
+    for (let j = 1; j < subArr[i].length; j += 1) {
+      if (subArr[i][j] === first) {
+        count += 1;
+      }
+    }
+    if (count === (subArr[i].length - 1)) {
+      ans.push(first);
+    }
+  }
+
+  let ansStr;
+  if (ans.length > 0) {
+    ansStr = `${ans.join('/')}/`;
+  } else {
+    ansStr = '';
+  }
+
+  return ansStr;
 }
 
 
@@ -499,8 +531,22 @@ function getMatrixProduct(m1, m2) {
  *    [    ,   ,    ]]
  *
  */
-function evaluateTicTacToePosition(/* position */) {
-  throw new Error('Not implemented');
+function evaluateTicTacToePosition(arr) {
+  for (let i = 0; i < arr.length; i += 1) {
+    if (arr[i][0] === arr[i][1] && arr[i][1] === arr[i][2] && arr[i][0] !== undefined) {
+      return arr[i][0];
+    }
+    if (arr[0][i] === arr[1][i] && arr[1][i] === arr[2][i] && arr[1][i] !== undefined) {
+      return arr[0][i];
+    }
+    if (arr[0][0] === arr[1][1] && arr[1][1] === arr[2][2] && arr[1][1] !== undefined) {
+      return arr[0][0];
+    }
+    if (arr[0][2] === arr[1][1] && arr[1][1] === arr[2][0] && arr[2][0] !== undefined) {
+      return arr[0][2];
+    }
+  }
+  return undefined;
 }
 
 

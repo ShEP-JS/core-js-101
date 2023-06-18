@@ -23,8 +23,10 @@
  *   getComposition(Math.sin, Math.asin)(x) => Math.sin(Math.asin(x))
  *
  */
-function getComposition(/* f, g */) {
-  throw new Error('Not implemented');
+function getComposition(f, g) {
+  return function compose(x) {
+    return f(g(x));
+  };
 }
 
 
@@ -44,8 +46,10 @@ function getComposition(/* f, g */) {
  *   power05(16) => 4
  *
  */
-function getPowerFunction(/* exponent */) {
-  throw new Error('Not implemented');
+function getPowerFunction(exponent) {
+  return function num(x) {
+    return x ** exponent;
+  };
 }
 
 
@@ -81,8 +85,14 @@ function getPolynom() {
  *   ...
  *   memoizer() => the same random number  (next run, returns the previous cached result)
  */
-function memoize(/* func */) {
-  throw new Error('Not implemented');
+function memoize(func) {
+  let res;
+  return function mem() {
+    if (res === undefined) {
+      res = func();
+    }
+    return res;
+  };
 }
 
 
@@ -101,8 +111,20 @@ function memoize(/* func */) {
  * }, 2);
  * retryer() => 2
  */
-function retry(/* func, attempts */) {
-  throw new Error('Not implemented');
+function retry(func, attempts) {
+  return function tryF() {
+    for (let i = 0; i < attempts; i += 1) {
+      try {
+        const res = func();
+        return res;
+      } catch (err) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+    }
+
+    return attempts;
+  };
 }
 
 
@@ -129,8 +151,19 @@ function retry(/* func, attempts */) {
  * cos(3.141592653589793) ends
  *
  */
-function logger(/* func, logFunc */) {
-  throw new Error('Not implemented');
+function logger(func, logFunc) {
+  return function answer(...rest) {
+    const r = [];
+    for (let i = 0; i < arguments.length; i += 1) {
+      r.push(rest[i]);
+    }
+
+    logFunc(`${func.name}(${r}) starts`);
+    // eslint-disable-next-line prefer-rest-params
+    func(arguments);
+    // eslint-disable-next-line prefer-rest-params
+    logFunc(`${func.name}(${arguments}) ends`);
+  };
 }
 
 
