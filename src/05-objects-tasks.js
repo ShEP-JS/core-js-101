@@ -115,34 +115,132 @@ function fromJSON(proto, json) {
  *
  *  For more examples see unit tests.
  */
+class CssBuilder {
+  constructor(result) {
+    if (result == null) {
+      this.result = '';
+    } else {
+      this.result = result;
+    }
+    this.hasId = false;
+    this.hasElement = false;
+    this.hasPseudoElement = false;
+    this.hasClass = false;
+    this.allowed = ['el', 'id', 'cl', 'at', 'pc', 'pe'];
+  }
+
+  element(value) {
+    if (this.hasElement) {
+      throw new Error('Element, id and pseudo-element should not occur more then one time inside the selector');
+    }
+
+    if (this.result !== '') {
+      throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    }
+
+    this.removeAllowed('el');
+    this.hasElement = true;
+    this.result = value;
+    return this;
+  }
+
+  id(value) {
+    if (this.hasId) {
+      throw new Error('Element, id and pseudo-element should not occur more then one time inside the selector');
+    }
+    if (!this.isAllowed('id')) {
+      throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    }
+
+    this.removeAllowed('id');
+    this.hasId = true;
+    this.result += `#${value}`;
+    return this;
+  }
+
+  class(value) {
+    if (!this.isAllowed('cl')) {
+      throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    }
+    this.removeAllowed('cl');
+    this.result += `.${value}`;
+    return this;
+  }
+
+  attr(value) {
+    if (!this.isAllowed('at')) {
+      throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    }
+
+    this.removeAllowed('at');
+    this.result += `[${value}]`;
+    return this;
+  }
+
+  pseudoClass(value) {
+    if (!this.isAllowed('pc')) {
+      throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    }
+
+    this.removeAllowed('pc');
+    this.result += `:${value}`;
+    return this;
+  }
+
+  pseudoElement(value) {
+    if (this.hasPseudoElement) {
+      throw new Error('Element, id and pseudo-element should not occur more then one time inside the selector');
+    }
+
+    if (!this.isAllowed('pe')) {
+      throw new Error('Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element');
+    }
+    this.removeAllowed('pe');
+    this.hasPseudoElement = true;
+    this.result += `::${value}`;
+    return this;
+  }
+
+  stringify() {
+    return this.result;
+  }
+
+  removeAllowed(name) {
+    this.allowed.splice(0, this.allowed.indexOf(name), 1);
+  }
+
+  isAllowed(name) {
+    return this.allowed.indexOf(name) > -1;
+  }
+}
 
 const cssSelectorBuilder = {
-  element(/* value */) {
-    throw new Error('Not implemented');
+  element(value) {
+    return new CssBuilder().element(value);
   },
 
-  id(/* value */) {
-    throw new Error('Not implemented');
+  id(value) {
+    return new CssBuilder().id(value);
   },
 
-  class(/* value */) {
-    throw new Error('Not implemented');
+  class(value) {
+    return new CssBuilder().class(value);
   },
 
-  attr(/* value */) {
-    throw new Error('Not implemented');
+  attr(value) {
+    return new CssBuilder().attr(value);
   },
 
-  pseudoClass(/* value */) {
-    throw new Error('Not implemented');
+  pseudoClass(value) {
+    return new CssBuilder().pseudoClass(value);
   },
 
-  pseudoElement(/* value */) {
-    throw new Error('Not implemented');
+  pseudoElement(value) {
+    return new CssBuilder().pseudoElement(value);
   },
 
-  combine(/* selector1, combinator, selector2 */) {
-    throw new Error('Not implemented');
+  combine(selector1, combinator, selector2) {
+    return new CssBuilder(`${selector1.stringify()} ${combinator} ${selector2.stringify()}`);
   },
 };
 
